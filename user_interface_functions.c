@@ -38,6 +38,7 @@ char* sh_read()
         }
     }
 
+    free(buffer);
     return EXIT_SUCCESS;
 
 }

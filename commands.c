@@ -54,6 +54,7 @@ void pwd(char** str, int len)
     }
 
     printf("%s\n",cwd);
+    //free(cwd);
 
     return ;
 }
@@ -79,6 +80,7 @@ void ls(char** str,int len)
         printf("%s ",dp->d_name);
     }
     closedir(dir);
+    //free(path);
 
     printf("\n");
     

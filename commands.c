@@ -28,7 +28,7 @@ void touch(char** str,int len)
 void pwd(char** str, int len)
 {
     int max_size=50;
-    char* cwd=(char*)calloc(sizeof(char),max_size);
+    char* cwd=(char*)malloc(sizeof(char)*max_size);
     if(cwd==NULL)
     printf("cwd is NULL");
 

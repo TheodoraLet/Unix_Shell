@@ -72,16 +72,10 @@ char* hashMapSearch(arg_str* arg,hashNode* ar,int* hashMapSize)
     {
         if(strcmp(ar[hashIndex].key,arg->_arg[0])==0)
         {
-            printf("the function to be executed is: ");
-            printf("%s\n",ar[hashIndex].key);
-            char* param=arg->_arg[1];
-            if(param==NULL)
-            {
-                printf("function has null arguments\n");
-                ar[hashIndex].p(NULL,0);
-            }else{
-                ar[hashIndex].p((arg->_arg)+1,(arg->_len)-1);
-            }
+            //printf("the function to be executed is: ");
+            //printf("%s\n",ar[hashIndex].key);
+            //char* param=arg->_arg[1];
+            ar[hashIndex].p((arg->_arg)+1,(arg->_len)-1);
             return EXIT_SUCCESS;
         }
 

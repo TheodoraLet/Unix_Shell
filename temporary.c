@@ -22,8 +22,8 @@ int main()
         arg_str* arg=tokenize(res);
     
         char* new=hashMapSearch(arg,ar,&max_number_of_functions);
-        free(res);
-        free(arg);
+        if(res) free(res);
+        if(arg) free(arg);
     }
     
 

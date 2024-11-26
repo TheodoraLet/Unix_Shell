@@ -41,9 +41,9 @@ void touch(char** str,int len)
 
 void pwd(char** str, int len)
 {
-    int max_size=100;
-    char buffer[max_size];
-    char* cwd=getcwd(buffer,max_size);
+    int max_size=50;
+    char* cwd=(char*)malloc(sizeof(char)*max_size);
+    cwd=getcwd(cwd,max_size);
 
     if(cd_ar[0]!='\0')
     {
@@ -54,7 +54,7 @@ void pwd(char** str, int len)
     }
 
     printf("%s\n",cwd);
-    //free(cwd);
+    free(cwd);
 
     return ;
 }
@@ -62,10 +62,10 @@ void pwd(char** str, int len)
 void ls(char** str,int len)
 {
     struct dirent* dp;
-    int max_size=100;
-    char buffer[max_size];
+    int max_size=50;
+    char* path=(char*)malloc(sizeof(char)*max_size);
 
-    char* path=getcwd(buffer,max_size);
+    path=getcwd(path,max_size);
     strcat(path,"/");
 
     if(cd_ar[0]!='\0')
@@ -80,9 +80,10 @@ void ls(char** str,int len)
         printf("%s ",dp->d_name);
     }
     closedir(dir);
-    //free(path);
 
     printf("\n");
+
+    free(path);
     
     return;
 }

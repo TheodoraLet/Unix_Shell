@@ -20,41 +20,26 @@ void echo(char** str,int len)
 void touch(char** str,int len)
 {
     FILE* file;
-
-    if(cd_ar[0]=='\0')
-    file=fopen(str[0],"w");
-
-    else{
-        int max_size=100;
-        char buffer[max_size];
-
-        char* cwd=getcwd(buffer,max_size);
-        strcat(cwd,"/");
-        strcat(cwd,cd_ar);
-        strcat(cwd,str[0]);
-        file=fopen(cwd,"w");
-    }
+    char* temp=(char*)malloc(sizeof(char)*100);
+    strcpy(temp,cd_ar);
+    strcat(temp,str[0]);
+    file=fopen(temp,"w");
 
     fclose(file);
 
+    free(temp);
+
+    return;
 }
 
 void pwd(char** str, int len)
-{
-    int max_size=50;
-    char* cwd=(char*)malloc(sizeof(char)*max_size);
-    cwd=getcwd(cwd,max_size);
-
-    if(cd_ar[0]!='\0')
-    {
-        strcat(cwd,"/");
-        strcat(cwd,cd_ar);
-        int len=strlen(cwd);
-        cwd[len-1]='\0';
-    }
-
-    printf("%s\n",cwd);
-    free(cwd);
+{ 
+    int l=strlen(cd_ar);
+    char* temp=(char*)malloc(sizeof(char)*l);
+    strcpy(temp,cd_ar);
+    temp[l-1]='\0';
+    printf("%s\n",temp);
+    free(temp);
 
     return ;
 }
@@ -62,28 +47,15 @@ void pwd(char** str, int len)
 void ls(char** str,int len)
 {
     struct dirent* dp;
-    int max_size=50;
-    char* path=(char*)malloc(sizeof(char)*max_size);
-
-    path=getcwd(path,max_size);
-    strcat(path,"/");
-
-    if(cd_ar[0]!='\0')
-    {
-        strcat(path,cd_ar);
-    }
-
-    DIR* dir=opendir(path);
+    DIR* dir=opendir(cd_ar);
     while(dp=readdir(dir))
     {
-
         printf("%s ",dp->d_name);
     }
     closedir(dir);
 
     printf("\n");
 
-    free(path);
     
     return;
 }
@@ -91,15 +63,38 @@ void ls(char** str,int len)
 
 void cd(char** str,int len)
 {
+
     if(str[0][0]!='.')
     {
-        strcpy(cd_ar,str[0]);
+        strcat(cd_ar,str[0]);
     }else
     {
-        for(int i=0;i<100;i++)
-        cd_ar[i]='\0';
+        int l=strlen(cd_ar);
+        int j=l-2;
+        while(j>=0)
+        {
+            if(cd_ar[j]=='/')
+            {
+                cd_ar[j+1]='\0';
+                break;
+            }
+
+            j--;
+        }
+
     }
 
-
     return ;
+}
+
+void get_initial_path()
+{
+    int max_size=50;
+    char* path=(char*)malloc(sizeof(char)*max_size);
+
+    path=getcwd(path,max_size);
+    strcpy(cd_ar,path);
+    strcat(cd_ar,"/");
+
+    return;
 }

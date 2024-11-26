@@ -13,4 +13,6 @@ void ls(char** str,int len);
 
 void cd(char** str,int len);
 
+void get_initial_path();
+
 #endif

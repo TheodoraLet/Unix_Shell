@@ -11,6 +11,7 @@
 int main()
 {
     hashNode* ar=(hashNode*)malloc(sizeof(hashNode)*max_number_of_functions);
+    get_initial_path();
 
     while(1)
     {
@@ -21,8 +22,8 @@ int main()
         arg_str* arg=tokenize(res);
     
         char* new=hashMapSearch(arg,ar,&max_number_of_functions);
-        free(res);
-        free(arg);
+        if(res) free(res);
+        if(arg) free(arg);
     }
     
 

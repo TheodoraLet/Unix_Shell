@@ -67,20 +67,26 @@ char* hashMapSearch(arg_str* arg,hashNode* ar,int* hashMapSize)
     int counter=0;
     int hashIndex=hash(arg->_arg[0],*hashMapSize);
 
+
     while(counter< *hashMapSize)
     {
         if(strcmp(ar[hashIndex].key,arg->_arg[0])==0)
         {
-            //printf("the function to be executed is: ");
-            //printf("%s\n",ar[hashIndex].key);
-            //char* param=arg->_arg[1];
-            ar[hashIndex].p((arg->_arg)+1,(arg->_len)-1);
+            printf("the function to be executed is: ");
+            printf("%s\n",ar[hashIndex].key);
+            char* param=arg->_arg[1];
+            if(param==NULL)
+            {
+                printf("function has null arguments\n");
+                ar[hashIndex].p(NULL,0);
+            }else{
+                ar[hashIndex].p((arg->_arg)+1,(arg->_len)-1);
+            }
             return EXIT_SUCCESS;
         }
-        
+
         if(ar[hashIndex].key!=arg->_arg[0] || ar[hashIndex].key==NULL)
         hashIndex=(hashIndex+1)%(*hashMapSize);
-
 
         counter++;
     }
@@ -115,8 +121,9 @@ void initializeHashMap(hashNode* ar)
     hashMapInsert(comm3,ar,&max_number_of_functions);
     free(comm3);
 
-    comm_str* comm4=CreateCommand("ls",ls);
+    comm_str* comm1=CreateCommand("ls",ls);
     
-    hashMapInsert(comm4,ar,&max_number_of_functions);
-    free(comm4);
+    hashMapInsert(comm1,ar,&max_number_of_functions);
+    free(comm1);
+
 }

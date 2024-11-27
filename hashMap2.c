@@ -124,4 +124,9 @@ void initializeHashMap(hashNode* ar)
     
     hashMapInsert(comm5,ar,&max_number_of_functions);
     free(comm5);
+
+    comm_str* comm1=CreateCommand("cp",cp);
+    
+    hashMapInsert(comm1,ar,&max_number_of_functions);
+    free(comm1);
 }

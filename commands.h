@@ -15,4 +15,6 @@ void cd(char** str,int len);
 
 void get_initial_path();
 
+void cp(char** str,int len);
+
 #endif

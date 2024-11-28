@@ -11,7 +11,11 @@
 int main()
 {
     hashNode* ar=(hashNode*)malloc(sizeof(hashNode)*max_number_of_functions);
-    initializeHashMap(ar);
+    
+    if(ar)
+    {
+        initializeHashMap(ar);
+    }
     get_initial_path();
 
     while(1)

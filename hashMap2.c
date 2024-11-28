@@ -31,7 +31,9 @@ void rehash(hashNode* ar,int* hashMapSize)
             hashIndex=(hashIndex+1)%(*hashMapSize);
         }
 
-        new[hashIndex].key=ar[hashIndex].key;
+        new[hashIndex].key=(char*)malloc(sizeof(char)*(strlen(ar[hashIndex].key)+1));
+        memcpy(new[hashIndex].key,ar[hashIndex].key,strlen(ar[hashIndex].key)+1);
+        free(ar[hashIndex].key);
     }
 
     free(ar);
@@ -53,7 +55,8 @@ void hashMapInsert(comm_str* comm,hashNode* ar,int* hashMapSize)
         hashIndex=(hashIndex+1)%(*hashMapSize);
     }
 
-    ar[hashIndex].key=strdup(comm->_fname);
+    ar[hashIndex].key=(char*)malloc(sizeof(char)*(strlen(comm->_fname)+1));
+    memcpy(ar[hashIndex].key,comm->_fname,strlen(comm->_fname)+1);
     ar[hashIndex].p=comm->ptr;
     //printf("hashIndex is:");
     //printf("%d\n",hashIndex);
@@ -97,6 +100,7 @@ char* hashMapSearch(arg_str* arg,hashNode* ar,int* hashMapSize)
 comm_str* CreateCommand(char* str,void (*ptr)(char **,int ))
 {
     comm_str* comm=(comm_str*)malloc(sizeof(comm_str));
+    //comm->_fname=(char*)malloc(sizeof(char*));
     comm->_fname=strdup(str);
     comm->ptr=ptr;
 
@@ -105,33 +109,36 @@ comm_str* CreateCommand(char* str,void (*ptr)(char **,int ))
 
 void initializeHashMap(hashNode* ar)
 {
-    comm_str* comm=CreateCommand("echo",echo);
+    comm_str* comm=CreateCommand("echo",&echo);
     
     hashMapInsert(comm,ar,&max_number_of_functions);
-    free(comm);
+    if(comm) free(comm->_fname); free(comm);comm=NULL; 
 
-    comm_str* comm2=CreateCommand("touch",touch);
+    comm=CreateCommand("touch",&touch);
     
-    hashMapInsert(comm2,ar,&max_number_of_functions);
-    free(comm2);
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname);free(comm);comm=NULL;
 
-    comm_str* comm3=CreateCommand("pwd",pwd);
+    comm=CreateCommand("pwd",&pwd);
     
-    hashMapInsert(comm3,ar,&max_number_of_functions);
-    free(comm3);
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname);free(comm);comm=NULL;
 
-    comm_str* comm4=CreateCommand("ls",ls);
-    
-    hashMapInsert(comm4,ar,&max_number_of_functions);
-    free(comm4);
 
-    comm_str* comm5=CreateCommand("cd",cd);
+    comm=CreateCommand("ls",&ls);
     
-    hashMapInsert(comm5,ar,&max_number_of_functions);
-    free(comm5);
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname);free(comm);comm=NULL;
 
-    comm_str* comm1=CreateCommand("cp",cp);
+    comm=CreateCommand("cd",&cd);
     
-    hashMapInsert(comm1,ar,&max_number_of_functions);
-    free(comm1);
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname); free(comm);comm=NULL;
+    
+
+    comm=CreateCommand("cp",&cp);
+    
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname);free(comm);comm=NULL;
+
 }

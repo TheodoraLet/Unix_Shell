@@ -30,6 +30,7 @@ void touch(char** str,int len)
     fclose(file);
 
     free(temp);
+    temp=NULL;
 
     return;
 }
@@ -42,8 +43,6 @@ void pwd(char** str, int len)
     //temp[l-1]='\0';
     printf("%s\n",cd_ar);
     //free(temp);
-    int l=strlen(cd_ar);
-    printf("cd_ar lenght is %d\n",l);
 
     return ;
 }
@@ -71,6 +70,7 @@ void cd(char** str,int len)
 {
     if(str==NULL)
     {
+        printf("got inside if\n");
         const char* temp=getenv("HOME");
         if(!temp)
         {
@@ -78,7 +78,7 @@ void cd(char** str,int len)
             printf("got inside getpwuid\n");
         }
         
-        strcpy(cd_ar,temp);
+        memcpy(cd_ar,temp,strlen(temp)+1);
         strcat(cd_ar,"/");
 
     }else if(strcmp(str[0],"..")==0)
@@ -143,8 +143,8 @@ void cp(char** str,int len)
 {
     FILE* file;
     FILE* file2;
-    bool case1=false;
     char* path1=(char*)malloc(sizeof(char)*100);
+    bool case1=false;
 
     if(str[0][0]=='/')
     {
@@ -274,4 +274,7 @@ void return_suffix(char* path2,char* str)
     }
     strcat(path2,temp);
     free(temp);
+    temp=NULL;
+
+    return;
 }

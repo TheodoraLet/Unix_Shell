@@ -23,7 +23,9 @@ int main()
     
         char* new=hashMapSearch(arg,ar,&max_number_of_functions);
         if(res) free(res);
+        res=NULL;
         if(arg) free(arg);
+        arg=NULL;
     }
     
 

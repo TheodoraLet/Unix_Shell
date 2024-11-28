@@ -4,6 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <pwd.h>
+#include <ctype.h>
 
 
 char cd_ar[100];
@@ -34,12 +36,12 @@ void touch(char** str,int len)
 
 void pwd(char** str, int len)
 { 
-    int l=strlen(cd_ar);
-    char* temp=(char*)malloc(sizeof(char)*l);
-    strcpy(temp,cd_ar);
-    temp[l-1]='\0';
-    printf("%s\n",temp);
-    free(temp);
+    //int l=strlen(cd_ar);
+    //char* temp=(char*)malloc(sizeof(char)*l);
+    //strcpy(temp,cd_ar);
+    //temp[l-1]='\0';
+    printf("%s\n",cd_ar);
+    //free(temp);
 
     return ;
 }
@@ -48,6 +50,9 @@ void ls(char** str,int len)
 {
     struct dirent* dp;
     DIR* dir=opendir(cd_ar);
+    if(!dir)
+    printf("could not open dir\n");
+
     while(dp=readdir(dir))
     {
         printf("%s ",dp->d_name);
@@ -55,7 +60,6 @@ void ls(char** str,int len)
     closedir(dir);
 
     printf("\n");
-
     
     return;
 }
@@ -63,11 +67,19 @@ void ls(char** str,int len)
 
 void cd(char** str,int len)
 {
-
-    if(str[0][0]!='.')
+    if(str==NULL)
     {
-        strcat(cd_ar,str[0]);
-    }else
+        const char* temp=getenv("HOME");
+        if(!temp)
+        {
+            temp=getpwuid(getuid())->pw_dir;
+            printf("got inside getpwuid\n");
+        }
+        
+        strcpy(cd_ar,temp);
+        strcat(cd_ar,"/");
+
+    }else if(strcmp(str[0],"..")==0)
     {
         int l=strlen(cd_ar);
         int j=l-2;
@@ -82,6 +94,27 @@ void cd(char** str,int len)
             j--;
         }
 
+    }else if(str[0][0]=='/')
+    {
+        strcpy(cd_ar,str[0]);
+
+    }else if(str[0][0]=='.')
+    {
+        strcat(cd_ar,str[0]+2);
+
+    }else if(str[0][0]=='~')
+    {
+        const char* temp=getenv("HOME");
+        if(!temp)
+        {
+            temp=getpwuid(getuid())->pw_dir;
+        }
+
+        strcpy(cd_ar,temp);
+        strcat(cd_ar,str[0]+1);
+
+    }else if(isalnum(str[0][0])==8){
+        strcat(cd_ar,str[0]);
     }
 
     return ;
@@ -95,6 +128,8 @@ void get_initial_path()
     path=getcwd(path,max_size);
     strcpy(cd_ar,path);
     strcat(cd_ar,"/");
+    free(path);
+    path=NULL;
 
     return;
 }

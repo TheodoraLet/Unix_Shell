@@ -17,4 +17,6 @@ void get_initial_path();
 
 void cp(char** str,int len);
 
+void return_suffix(char* path2,char* str);
+
 #endif

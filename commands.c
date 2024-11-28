@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <pwd.h>
 
 
 char cd_ar[100];
@@ -100,15 +101,18 @@ void get_initial_path()
     return;
 }
 
+void return_suffix(char* path2,char* str);
+
 void cp(char** str,int len)
 {
     FILE* file;
     FILE* file2;
-    bool flag_path1=false;
+    bool case1=false;
     char* path1=(char*)malloc(sizeof(char)*100);
 
     if(str[0][0]=='/')
     {
+        case1=true;
         printf("1\n");
         file=fopen(str[0],"r");
         if(!file)
@@ -124,16 +128,26 @@ void cp(char** str,int len)
         }else{
             strcat(path1,str[0]);
         }
-        printf("path1 is :");
-        printf("%s\n",path1);
+        
+    }else if(str[0][0]=='~')
+    {
+        const char* temp=getenv("HOME");
+        if(!temp)
+        {
+            temp=getpwuid(getuid())->pw_dir;
+        }
+        strcpy(path1,temp);
+        strcat(path1,str[0]+1);
+    }else{
+        printf("wrong source path is provided\n");
+    }
+
+    if(!case1)
+    {
+        printf("path1 is : %s\n",path1);
         file=fopen(path1,"r");
         if(!file)
         printf("file 1 is NULL\n");
-        flag_path1=true;
-    }else{
-        printf("wrong source path is provided\n");
-        // printf("the first element is: %c\n",str[0][0]);
-        // printf("%d\n",isalnum(str[0][0]));
     }
 
     ///////////////////////////////////////////////////////
@@ -145,22 +159,8 @@ void cp(char** str,int len)
         strcpy(path2,str[1]);
         if(str[1][l-1]=='/')
         {
-            int l1=strlen(str[0]);
-            char* temp=(char*)malloc(sizeof(char)*100);
-            printf("1\n");
-            char* token=strtok(str[0],"/");
-            while(token!=NULL)
-            {
-                strcpy(temp,token);
-                token=strtok(NULL,"/");
-            }
-            strcat(path2,temp);
-            free(temp);
+            return_suffix(path2,str[0]);
         }
-
-        file2=fopen(path2,"w");
-        if(!file2)
-        printf("file 2 is NULL\n");
 
     }else if((isalnum(str[1][0])==8) || (str[1][0]=='.') )
     {
@@ -173,24 +173,35 @@ void cp(char** str,int len)
         }
         if(str[1][l-1]=='/')
         {
-            //printf("got in the / if\n");
-            int l1=strlen(str[0]);
-            char* temp=(char*)malloc(sizeof(char)*100);
-            char* token=strtok(str[0],"/");
-            while(token!=NULL)
-            {
-                strcpy(temp,token);
-                token=strtok(NULL,"/");
-            }
-            strcat(path2,temp);
+            return_suffix(path2,str[0]);
         }
-        printf("path2 is :");
-        printf("%s\n",path2);
-        file2=fopen(path2,"w");
-        if(!file2)
-        printf("file2 is NULL\n");
+        
+    }else if(str[1][0]=='~')
+    {
+        const char* temp2=getenv("HOME");
+        if(!temp2)
+        {
+            temp2=getpwuid(getuid())->pw_dir;
+            printf("got inside getpwuid\n");
+        }
+        strcpy(path2,temp2);
+        strcat(path2,str[1]+1);
+        int l=strlen(str[1]);
+        if(str[1][l-1]=='/')
+        {
+            return_suffix(path2,str[0]);
+        }
+
     }else{
         printf("wrong destination path is provided\n");
+    }
+
+    if(path2)
+    {
+        printf("path2 is : %s\n",path2);
+        file2=fopen(path2,"w");
+        if(!file2)
+        printf("file 2 is NULL\n");
     }
 
     int c;
@@ -199,11 +210,27 @@ void cp(char** str,int len)
         fputc(c,file2);
     }
 
-    fclose(file);
-    fclose(file2);
+    int c1= fclose(file);
+    int c2=fclose(file2);
+    printf("c1 is %d , c2 is %d\n",c1,c2);
     free(path2);
-    if(flag_path1) free(path1);
+    free(path1);
     
 
     return;
+}
+
+void return_suffix(char* path2,char* str)
+{
+    int l1=strlen(str);
+    char* temp=(char*)malloc(sizeof(char)*100);
+    //printf("1\n");
+    char* token=strtok(str,"/");
+    while(token!=NULL)
+    {
+        strcpy(temp,token);
+        token=strtok(NULL,"/");
+    }
+    strcat(path2,temp);
+    free(temp);
 }

@@ -11,12 +11,11 @@
 int main()
 {
     hashNode* ar=(hashNode*)malloc(sizeof(hashNode)*max_number_of_functions);
+    initializeHashMap(ar);
     get_initial_path();
 
     while(1)
-    {
-        initializeHashMap(ar);
-    
+    {    
         char* res=sh_read();
         
         arg_str* arg=tokenize(res);

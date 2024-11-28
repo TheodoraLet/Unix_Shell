@@ -36,12 +36,14 @@ void touch(char** str,int len)
 
 void pwd(char** str, int len)
 { 
+    //int l=strlen(cd_ar);
+    //char* temp=(char*)malloc(sizeof(char)*l);
+    //strcpy(temp,cd_ar);
+    //temp[l-1]='\0';
+    printf("%s\n",cd_ar);
+    //free(temp);
     int l=strlen(cd_ar);
-    char* temp=(char*)malloc(sizeof(char)*l);
-    strcpy(temp,cd_ar);
-    temp[l-1]='\0';
-    printf("%s\n",temp);
-    free(temp);
+    printf("cd_ar lenght is %d\n",l);
 
     return ;
 }
@@ -50,6 +52,9 @@ void ls(char** str,int len)
 {
     struct dirent* dp;
     DIR* dir=opendir(cd_ar);
+    if(!dir)
+    printf("could not open dir\n");
+
     while(dp=readdir(dir))
     {
         printf("%s ",dp->d_name);
@@ -57,7 +62,6 @@ void ls(char** str,int len)
     closedir(dir);
 
     printf("\n");
-
     
     return;
 }
@@ -65,11 +69,19 @@ void ls(char** str,int len)
 
 void cd(char** str,int len)
 {
-
-    if(str[0][0]!='.')
+    if(str==NULL)
     {
-        strcat(cd_ar,str[0]);
-    }else
+        const char* temp=getenv("HOME");
+        if(!temp)
+        {
+            temp=getpwuid(getuid())->pw_dir;
+            printf("got inside getpwuid\n");
+        }
+        
+        strcpy(cd_ar,temp);
+        strcat(cd_ar,"/");
+
+    }else if(strcmp(str[0],"..")==0)
     {
         int l=strlen(cd_ar);
         int j=l-2;
@@ -84,10 +96,32 @@ void cd(char** str,int len)
             j--;
         }
 
+    }else if(str[0][0]=='/')
+    {
+        strcpy(cd_ar,str[0]);
+
+    }else if(str[0][0]=='.')
+    {
+        strcat(cd_ar,str[0]+2);
+
+    }else if(str[0][0]=='~')
+    {
+        const char* temp=getenv("HOME");
+        if(!temp)
+        {
+            temp=getpwuid(getuid())->pw_dir;
+        }
+
+        strcpy(cd_ar,temp);
+        strcat(cd_ar,str[0]+1);
+
+    }else if(isalnum(str[0][0])==8){
+        strcat(cd_ar,str[0]);
     }
 
     return ;
 }
+
 
 void get_initial_path()
 {
@@ -97,6 +131,8 @@ void get_initial_path()
     path=getcwd(path,max_size);
     strcpy(cd_ar,path);
     strcat(cd_ar,"/");
+    free(path);
+    path=NULL;
 
     return;
 }
@@ -117,6 +153,7 @@ void cp(char** str,int len)
         file=fopen(str[0],"r");
         if(!file)
         printf("file 1 is NULL\n");
+
     }else if((isalnum(str[0][0])==8) || (str[0][0]=='.'))
     {
         //printf("got inside the second if\n");
@@ -136,8 +173,10 @@ void cp(char** str,int len)
         {
             temp=getpwuid(getuid())->pw_dir;
         }
+
         strcpy(path1,temp);
         strcat(path1,str[0]+1);
+
     }else{
         printf("wrong source path is provided\n");
     }
@@ -184,9 +223,11 @@ void cp(char** str,int len)
             temp2=getpwuid(getuid())->pw_dir;
             printf("got inside getpwuid\n");
         }
+
         strcpy(path2,temp2);
         strcat(path2,str[1]+1);
         int l=strlen(str[1]);
+
         if(str[1][l-1]=='/')
         {
             return_suffix(path2,str[0]);

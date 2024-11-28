@@ -12,10 +12,10 @@ int main()
 {
     
     hashNode* ar=(hashNode*)malloc(sizeof(hashNode)*max_number_of_functions);
+    initializeHashMap(ar);
 
     while(1)
     {
-        initializeHashMap(ar);
       
         char* res=sh_read();
         

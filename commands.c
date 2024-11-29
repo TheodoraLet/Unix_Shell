@@ -22,6 +22,62 @@ void echo(char** str,int len)
 void touch(char** str,int len)
 {
     FILE* file;
+
+    printf("len is %d\n",len);
+    for(int i=0;i<len;i++)
+    {
+        if(str[i][0]=='~')
+        {   
+            printf("got inside first if\n");
+            char path[100] ;
+            const char* temp=getenv("HOME");
+            if(!temp)
+            {
+                temp=getpwuid(getuid())->pw_dir;
+            }
+
+            //printf("1\n");
+            memcpy(path,temp,strlen(temp)+1);
+            //printf("2\n");
+            strcat(path,str[i]+1);
+            printf("path is %s\n",path);
+            file=fopen(path,"w");
+            int c=fclose(file);
+            
+            if(c)
+            printf("an error occured\n");
+
+        }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
+        {
+            char path[100];
+            strcpy(path,cd_ar);
+            if(str[i][0]=='.')
+            {
+                strcat(path,str[i]+2);
+            }else{
+                strcat(path,str[i]);
+            }
+
+            printf("path is %s\n",path);
+            file=fopen(path,"w");
+            int c=fclose(file);
+            
+            if(c)
+            printf("an error occured\n");
+
+        }else if(str[i][0]=='/'){
+            printf("path is %s\n",str[i]);
+            file=fopen(str[i],"w");
+            int c=fclose(file);
+
+            if(c)
+            printf("an error occured\n");
+
+        }else{
+            printf("did not find the file\n");
+        }
+    }
+
     char* temp=(char*)malloc(sizeof(char)*100);
     strcpy(temp,cd_ar);
     strcat(temp,str[0]);
@@ -277,4 +333,59 @@ void return_suffix(char* path2,char* str)
     temp=NULL;
 
     return;
+}
+
+
+void rm(char** str,int len)
+{
+    printf("len is %d\n",len);
+    for(int i=0;i<len;i++)
+    {
+        if(str[i][0]=='~')
+        {   
+            printf("got inside first if\n");
+            char path[100] ;
+            const char* temp=getenv("HOME");
+            if(!temp)
+            {
+                temp=getpwuid(getuid())->pw_dir;
+            }
+
+            //printf("1\n");
+            memcpy(path,temp,strlen(temp)+1);
+            //printf("2\n");
+            strcat(path,str[i]+1);
+            printf("path is %s\n",path);
+
+            int c=unlink(path);
+
+            if(c!=0)
+            printf("an error occured\n");
+        }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
+        {
+            char path[100];
+            strcpy(path,cd_ar);
+            if(str[i][0]=='.')
+            {
+                strcat(path,str[i]+2);
+            }else{
+                strcat(path,str[i]);
+            }
+
+            printf("path is %s\n",path);
+            int c=unlink(path);
+            if(c!=0)
+            printf("an error occured\n");
+
+        }else if(str[i][0]=='/'){
+            printf("path is %s\n",str[i]);
+            int c=unlink(str[i]);
+            if(c!=0)
+            printf("an error occured\n");
+        }else{
+            printf("did not find the file\n");
+        }
+    }
+
+    return ;
 }

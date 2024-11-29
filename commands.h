@@ -21,4 +21,6 @@ void return_suffix(char* path2,char* str);
 
 void rm(char** str,int len);
 
+void mkdir_m(char** str, int len);
+
 #endif

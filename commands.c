@@ -6,6 +6,8 @@
 #include <dirent.h>
 #include <ctype.h>
 #include <pwd.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 
 char cd_ar[100];
@@ -384,6 +386,60 @@ void rm(char** str,int len)
             printf("an error occured\n");
         }else{
             printf("did not find the file\n");
+        }
+    }
+
+    return ;
+}
+
+void mkdir_m(char** str, int len)
+{
+    //printf("len is %d\n",len);
+    for(int i=0;i<len;i++)
+    {
+        if(str[i][0]=='~')
+        {   
+            printf("got inside first if\n");
+            char path[100] ;
+            const char* temp=getenv("HOME");
+            if(!temp)
+            {
+                temp=getpwuid(getuid())->pw_dir;
+            }
+
+            //printf("1\n");
+            memcpy(path,temp,strlen(temp)+1);
+            //printf("2\n");
+            strcat(path,str[i]+1);
+            printf("path is %s\n",path);
+
+            int c=mkdir(path,S_IRWXU | S_IRWXG | S_IRWXO);
+
+            if(c==-1)
+            printf("Error: %s\n",strerror(errno));
+        }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
+        {
+            char path[100];
+            strcpy(path,cd_ar);
+            if(str[i][0]=='.')
+            {
+                strcat(path,str[i]+2);
+            }else{
+                strcat(path,str[i]);
+            }
+
+            printf("path is %s\n",path);
+            int c=mkdir(path,S_IRWXU | S_IRWXG | S_IRWXO);
+            if(c==-1)
+            printf("Error: %s\n",strerror(errno));
+
+        }else if(str[i][0]=='/'){
+            printf("path is %s\n",str[i]);
+            int c=mkdir(str[i],S_IRWXU | S_IRWXG | S_IRWXO);
+            if(c==-1)
+            printf("Error: %s\n",strerror(errno));
+        }else{
+            printf("did not understand the path\n");
         }
     }
 

@@ -146,4 +146,9 @@ void initializeHashMap(hashNode* ar)
     hashMapInsert(comm,ar,&max_number_of_functions);
     if(comm) free(comm->_fname);free(comm);comm=NULL;
 
+    comm=CreateCommand("mkdir_m",&mkdir_m);
+    
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname);free(comm);comm=NULL;
+
 }

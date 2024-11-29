@@ -12,6 +12,9 @@
 
 char cd_ar[100];
 
+char* home_path(char* arg);
+char* relative_path(char* arg);
+
 void echo(char** str,int len)
 {
     for(int i=0;i<len;i++)
@@ -25,44 +28,28 @@ void touch(char** str,int len)
 {
     FILE* file;
 
-    printf("len is %d\n",len);
+    char* path;
     for(int i=0;i<len;i++)
     {
         if(str[i][0]=='~')
         {   
-            printf("got inside first if\n");
-            char path[100] ;
-            const char* temp=getenv("HOME");
-            if(!temp)
-            {
-                temp=getpwuid(getuid())->pw_dir;
-            }
-
-            //printf("1\n");
-            memcpy(path,temp,strlen(temp)+1);
-            //printf("2\n");
-            strcat(path,str[i]+1);
+            path=home_path(str[i]);
             printf("path is %s\n",path);
             file=fopen(path,"w");
             int c=fclose(file);
+            free(path);
             
             if(c)
             printf("an error occured\n");
 
         }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
         {
-            char path[100];
-            strcpy(path,cd_ar);
-            if(str[i][0]=='.')
-            {
-                strcat(path,str[i]+2);
-            }else{
-                strcat(path,str[i]);
-            }
 
+            path=relative_path(str[i]);
             printf("path is %s\n",path);
             file=fopen(path,"w");
             int c=fclose(file);
+            free(path);
             
             if(c)
             printf("an error occured\n");
@@ -79,16 +66,6 @@ void touch(char** str,int len)
             printf("did not find the file\n");
         }
     }
-
-    char* temp=(char*)malloc(sizeof(char)*100);
-    strcpy(temp,cd_ar);
-    strcat(temp,str[0]);
-    file=fopen(temp,"w");
-
-    fclose(file);
-
-    free(temp);
-    temp=NULL;
 
     return;
 }
@@ -201,7 +178,7 @@ void cp(char** str,int len)
 {
     FILE* file;
     FILE* file2;
-    char* path1=(char*)malloc(sizeof(char)*100);
+    char* path;
     bool case1=false;
 
     if(str[0][0]=='/')
@@ -214,45 +191,34 @@ void cp(char** str,int len)
 
     }else if((isalnum(str[0][0])==8) || (str[0][0]=='.'))
     {
-        //printf("got inside the second if\n");
-        //printf("cd ar is: %s\n",cd_ar);
-        strcpy(path1,cd_ar);
-        if(str[0][0]=='.')
-        {
-            strcat(path1,str[0]+2);
-        }else{
-            strcat(path1,str[0]);
-        }
+        path=relative_path(str[0]);
+        printf("path is %s\n",path);
         
     }else if(str[0][0]=='~')
     {
-        const char* temp=getenv("HOME");
-        if(!temp)
-        {
-            temp=getpwuid(getuid())->pw_dir;
-        }
-
-        strcpy(path1,temp);
-        strcat(path1,str[0]+1);
+        path=home_path(str[0]);
+        printf("path is %s\n",path);
 
     }else{
         printf("wrong source path is provided\n");
+        return;
     }
 
     if(!case1)
     {
-        printf("path1 is : %s\n",path1);
-        file=fopen(path1,"r");
+        printf("path1 is : %s\n",path);
+        file=fopen(path,"r");
         if(!file)
         printf("file 1 is NULL\n");
     }
 
     ///////////////////////////////////////////////////////
 
-    char* path2=(char*)malloc(sizeof(char)*100);
+    char* path2;
     int l=strlen(str[1]);
     if(str[1][0]=='/')
     {
+        path2=(char*)malloc(sizeof(char)*(strlen(str[0])+strlen(str[1])+1));
         strcpy(path2,str[1]);
         if(str[1][l-1]=='/')
         {
@@ -261,38 +227,28 @@ void cp(char** str,int len)
 
     }else if((isalnum(str[1][0])==8) || (str[1][0]=='.') )
     {
-        strcpy(path2,cd_ar);
-        if(str[1][0]=='.')
-        {
-            strcat(path2,str[1]+2);
-        }else{
-            strcat(path2,str[1]);
-        }
+        path2=relative_path(str[1]);
+
         if(str[1][l-1]=='/')
         {
+            path2=realloc(path2,strlen(cd_ar)+strlen(str[1])+strlen(str[0])+1);
             return_suffix(path2,str[0]);
         }
         
     }else if(str[1][0]=='~')
     {
-        const char* temp2=getenv("HOME");
-        if(!temp2)
-        {
-            temp2=getpwuid(getuid())->pw_dir;
-            printf("got inside getpwuid\n");
-        }
-
-        strcpy(path2,temp2);
-        strcat(path2,str[1]+1);
-        int l=strlen(str[1]);
+        path2=home_path(str[1]);
 
         if(str[1][l-1]=='/')
         {
+            int max_size_of_home_dir=20;
+            path2=realloc(path2,sizeof(char)*max_size_of_home_dir +strlen(str[1])+strlen(str[0])+1);
             return_suffix(path2,str[0]);
         }
 
     }else{
         printf("wrong destination path is provided\n");
+        return;
     }
 
     if(path2)
@@ -313,7 +269,7 @@ void cp(char** str,int len)
     int c2=fclose(file2);
     printf("c1 is %d , c2 is %d\n",c1,c2);
     free(path2);
-    free(path1);
+    if(!case1) free(path);
     
 
     return;
@@ -322,7 +278,7 @@ void cp(char** str,int len)
 void return_suffix(char* path2,char* str)
 {
     int l1=strlen(str);
-    char* temp=(char*)malloc(sizeof(char)*100);
+    char* temp=(char*)malloc(sizeof(char)*(strlen(str)+1));
     //printf("1\n");
     char* token=strtok(str,"/");
     while(token!=NULL)
@@ -345,45 +301,30 @@ void rm(char** str,int len)
     {
         if(str[i][0]=='~')
         {   
-            printf("got inside first if\n");
-            char path[100] ;
-            const char* temp=getenv("HOME");
-            if(!temp)
-            {
-                temp=getpwuid(getuid())->pw_dir;
-            }
-
-            //printf("1\n");
-            memcpy(path,temp,strlen(temp)+1);
-            //printf("2\n");
-            strcat(path,str[i]+1);
-            printf("path is %s\n",path);
-
+            char* path=home_path(str[i]);
             int c=unlink(path);
+            free(path);
 
             if(c!=0)
             printf("an error occured\n");
+
         }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
         {
-            char path[100];
-            strcpy(path,cd_ar);
-            if(str[i][0]=='.')
-            {
-                strcat(path,str[i]+2);
-            }else{
-                strcat(path,str[i]);
-            }
-
-            printf("path is %s\n",path);
+            char* path=relative_path(str[i]);
             int c=unlink(path);
+            free(path);
+
             if(c!=0)
             printf("an error occured\n");
 
         }else if(str[i][0]=='/'){
-            printf("path is %s\n",str[i]);
-            int c=unlink(str[i]);
+            char temp[strlen(str[i])+1];
+            strcpy(temp,str[i]);
+            int c=unlink(temp);
+
             if(c!=0)
             printf("an error occured\n");
+
         }else{
             printf("did not find the file\n");
         }
@@ -392,56 +333,74 @@ void rm(char** str,int len)
     return ;
 }
 
+
 void mkdir_m(char** str, int len)
 {
-    //printf("len is %d\n",len);
     for(int i=0;i<len;i++)
     {
         if(str[i][0]=='~')
         {   
-            printf("got inside first if\n");
-            char path[100] ;
-            const char* temp=getenv("HOME");
-            if(!temp)
-            {
-                temp=getpwuid(getuid())->pw_dir;
-            }
-
-            //printf("1\n");
-            memcpy(path,temp,strlen(temp)+1);
-            //printf("2\n");
-            strcat(path,str[i]+1);
+            char* path=home_path(str[i]);
             printf("path is %s\n",path);
 
             int c=mkdir(path,S_IRWXU | S_IRWXG | S_IRWXO);
+
+            free(path);
 
             if(c==-1)
             printf("Error: %s\n",strerror(errno));
+
         }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
         {
-            char path[100];
-            strcpy(path,cd_ar);
-            if(str[i][0]=='.')
-            {
-                strcat(path,str[i]+2);
-            }else{
-                strcat(path,str[i]);
-            }
-
+            char* path=relative_path(str[i]);
             printf("path is %s\n",path);
+
             int c=mkdir(path,S_IRWXU | S_IRWXG | S_IRWXO);
+            free(path);
+
             if(c==-1)
             printf("Error: %s\n",strerror(errno));
 
         }else if(str[i][0]=='/'){
-            printf("path is %s\n",str[i]);
-            int c=mkdir(str[i],S_IRWXU | S_IRWXG | S_IRWXO);
+            char temp[strlen(str[i])+1];
+            strcpy(temp,str[i]);
+            int c=mkdir(temp,S_IRWXU | S_IRWXG | S_IRWXO);
+
             if(c==-1)
             printf("Error: %s\n",strerror(errno));
+
         }else{
             printf("did not understand the path\n");
         }
     }
 
     return ;
+}
+
+char* home_path(char* arg)
+{
+    const char* temp=getenv("HOME");
+    if(!temp)
+    {
+        temp=getpwuid(getuid())->pw_dir;
+    }
+    char* path=(char*)malloc(sizeof(char)* (strlen(temp)+strlen(arg)+1));
+    memcpy(path,temp,strlen(temp)+1);
+    strcat(path,arg+1);
+
+    return path;
+}
+
+char* relative_path(char* arg)
+{
+    char* path=(char*)malloc(sizeof(char)* (strlen(cd_ar)+strlen(arg)+1));
+    memcpy(path,cd_ar,strlen(cd_ar)+1);
+    if(arg[0]=='.')
+    {
+        strcat(path,arg+2);
+    }else{
+        strcat(path,arg);
+    }
+
+    return path;
 }

@@ -3,6 +3,10 @@
 
 extern char cd_ar[];
 
+char* home_path(char* arg);
+
+char* relative_path(char* arg);
+
 void echo(char** str,int len);
 
 void touch(char** str,int len);
@@ -22,5 +26,6 @@ void return_suffix(char* path2,char* str);
 void rm(char** str,int len);
 
 void mkdir_m(char** str, int len);
+
 
 #endif

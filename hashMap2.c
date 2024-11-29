@@ -100,8 +100,8 @@ char* hashMapSearch(arg_str* arg,hashNode* ar,int* hashMapSize)
 comm_str* CreateCommand(char* str,void (*ptr)(char **,int ))
 {
     comm_str* comm=(comm_str*)malloc(sizeof(comm_str));
-    //comm->_fname=(char*)malloc(sizeof(char*));
-    comm->_fname=strdup(str);
+    comm->_fname=(char*)malloc(sizeof(char)*(strlen(str)+1));
+    memcpy(comm->_fname,str,strlen(str)+1);
     comm->ptr=ptr;
 
     return comm;

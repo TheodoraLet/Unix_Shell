@@ -68,7 +68,7 @@ void ls(char** str,int len)
 
 void cd(char** str,int len)
 {
-    if(str==NULL)
+    if(len==0)
     {
         printf("got inside if\n");
         const char* temp=getenv("HOME");

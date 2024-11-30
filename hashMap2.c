@@ -151,4 +151,14 @@ void initializeHashMap(hashNode* ar)
     hashMapInsert(comm,ar,&max_number_of_functions);
     if(comm) free(comm->_fname);free(comm);comm=NULL;
 
+    comm=CreateCommand("whoami",&whoami);
+    
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname);free(comm);comm=NULL;
+
+    comm=CreateCommand("wc",&wc);
+    
+    hashMapInsert(comm,ar,&max_number_of_functions);
+    if(comm) free(comm->_fname);free(comm);comm=NULL;
+
 }

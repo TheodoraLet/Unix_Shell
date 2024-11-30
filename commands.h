@@ -27,5 +27,11 @@ void rm(char** str,int len);
 
 void mkdir_m(char** str, int len);
 
+void whoami(char** str, int len);
+
+void wc(char** str, int len);
+
+char* return_name(char* str);
+
 
 #endif

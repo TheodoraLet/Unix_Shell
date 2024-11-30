@@ -105,7 +105,7 @@ void cd(char** str,int len)
 {
     if(len==0)
     {
-        printf("got inside if\n");
+        //printf("got inside if\n");
         const char* temp=getenv("HOME");
         if(!temp)
         {
@@ -152,6 +152,8 @@ void cd(char** str,int len)
 
     }else if(isalnum(str[0][0])==8){
         strcat(cd_ar,str[0]);
+    }else{
+        printf("the path provided is not found\n");
     }
 
     return ;
@@ -403,4 +405,109 @@ char* relative_path(char* arg)
     }
 
     return path;
+}
+
+
+void whoami(char** str, int len)
+{
+    char* temp=getlogin();
+
+    if(temp)
+    {
+        printf("%s\n",temp);
+    }else{
+        printf("Error: %s\n",strerror(errno));
+    }
+}
+
+char* return_name(char* str);
+
+void wc(char** str, int len)
+{
+    FILE* file;
+    char* path;
+    for(int i=0;i<len;i++)
+    {
+        if(str[i][0]=='~')
+        {   
+            path=home_path(str[i]);
+            //printf("path is %s\n",path);
+
+        }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
+        {
+            path=relative_path(str[i]);
+            //printf("path is %s\n",path);
+
+
+        }else if(str[i][0]=='/'){
+            path=(char*)malloc(sizeof(char)*(strlen(str[i])+1));
+            strcpy(path,str[i]);
+
+        }else{
+            printf("did not understand the path\n");
+            return;
+        }
+
+        file=fopen(path,"r");
+        
+        if(!file) printf("file is NULL\n"); 
+
+        int count=0; int word=0; char ch; int lines=0;
+        while((ch=fgetc(file))!=EOF)
+        {
+            if(ch==' ' || ch=='\n')
+            {
+                word=0;
+                if(ch=='\n')
+                lines++;
+
+            }else{
+                if(!word)
+                {
+                    count++;
+                    word=1;
+                }
+            }
+        }
+        int c=fclose(file);
+
+        if(c!=0)
+        printf("Error : %s\n",strerror(errno));
+
+        file=fopen(path,"r");
+        
+        if(!file) printf("file is NULL\n"); 
+        fseek(file, 0L, SEEK_END); 
+
+        long int res = ftell(file);
+
+        c=fclose(file);
+        if(c!=0)
+        printf("Error : %s\n",strerror(errno));
+
+        char* temp=return_name(str[i]);
+        if(strcmp(temp,"pdf")==0)
+        printf("entered a .pdf file lines and words numbers are not valid!\n");
+        
+        printf("%d %d %ld %s\n",lines,count,res,path);
+        if(path) free(path);
+        free(temp);
+    }
+
+    return;
+}
+
+char* return_name(char* str)
+{
+    int l1=strlen(str);
+    char* temp=(char*)malloc(sizeof(char)*(strlen(str)+1));
+    //printf("1\n");
+    char* token=strtok(str,".");
+    while(token!=NULL)
+    {
+        strcpy(temp,token);
+        token=strtok(NULL,".");
+    }
+
+    return temp;
 }

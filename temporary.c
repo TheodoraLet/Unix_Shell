@@ -10,18 +10,36 @@
 
 int main()
 {
-    
     hashNode* ar=(hashNode*)malloc(sizeof(hashNode)*max_number_of_functions);
-    initializeHashMap(ar);
+    
+    if(ar)
+    {
+        initializeHashMap(ar);
+    }
+    get_initial_path();
 
     while(1)
     {
-      
         char* res=sh_read();
         
         arg_str* arg=tokenize(res);
     
         char* new=hashMapSearch(arg,ar,&max_number_of_functions);
+        if(res) 
+        {
+            free(res);
+            res=NULL;
+        }else{
+            printf("res =NULL\n");
+        }
+
+        if(arg) 
+        {
+            free(arg);
+            arg=NULL;
+        }else{
+            printf("arg=NULL\n");
+        }
         if(res) free(res);
         if(arg) free(arg);
     }

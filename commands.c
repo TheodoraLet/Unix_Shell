@@ -14,6 +14,8 @@ char cd_ar[100];
 
 char* home_path(char* arg);
 char* relative_path(char* arg);
+char* return_parent_path(char* str);
+bool startsWith(char* haystack, char* needle);
 
 void echo(char** str,int len)
 {
@@ -34,6 +36,17 @@ void touch(char** str,int len)
         if(str[i][0]=='~')
         {   
             path=home_path(str[i]);
+            printf("path is %s\n",path);
+            file=fopen(path,"w");
+            int c=fclose(file);
+            free(path);
+            
+            if(c)
+            printf("an error occured\n");
+
+        }else if(startsWith(str[i],"../"))
+        {
+            path=return_parent_path(str[i]);
             printf("path is %s\n",path);
             file=fopen(path,"w");
             int c=fclose(file);
@@ -191,6 +204,11 @@ void cp(char** str,int len)
         if(!file)
         printf("file 1 is NULL\n");
 
+    }else if(startsWith(str[0],"../"))
+    {
+        path=return_parent_path(str[0]);
+        printf("path is %s\n",path);
+
     }else if((isalnum(str[0][0])==8) || (str[0][0]=='.'))
     {
         path=relative_path(str[0]);
@@ -227,13 +245,23 @@ void cp(char** str,int len)
             return_suffix(path2,str[0]);
         }
 
+    }else if(startsWith(str[1],"../"))
+    {
+        path2=return_parent_path(str[1]);
+
+        if(str[1][l-1]=='/')
+        {
+            path2=realloc(path2,strlen(path2)+strlen(str[0])+1);
+            return_suffix(path2,str[0]);
+        }
+
     }else if((isalnum(str[1][0])==8) || (str[1][0]=='.') )
     {
         path2=relative_path(str[1]);
 
         if(str[1][l-1]=='/')
         {
-            path2=realloc(path2,strlen(cd_ar)+strlen(str[1])+strlen(str[0])+1);
+            path2=realloc(path2,strlen(path2)+strlen(str[0])+1);
             return_suffix(path2,str[0]);
         }
         
@@ -244,7 +272,7 @@ void cp(char** str,int len)
         if(str[1][l-1]=='/')
         {
             int max_size_of_home_dir=20;
-            path2=realloc(path2,sizeof(char)*max_size_of_home_dir +strlen(str[1])+strlen(str[0])+1);
+            path2=realloc(path2,strlen(path2)+strlen(str[0])+1);
             return_suffix(path2,str[0]);
         }
 
@@ -269,7 +297,7 @@ void cp(char** str,int len)
 
     int c1= fclose(file);
     int c2=fclose(file2);
-    printf("c1 is %d , c2 is %d\n",c1,c2);
+    //printf("c1 is %d , c2 is %d\n",c1,c2);
     free(path2);
     if(!case1) free(path);
     
@@ -304,6 +332,15 @@ void rm(char** str,int len)
         if(str[i][0]=='~')
         {   
             char* path=home_path(str[i]);
+            int c=unlink(path);
+            free(path);
+
+            if(c!=0)
+            printf("an error occured\n");
+
+        }else if(startsWith(str[i],"../"))
+        {
+            char* path=return_parent_path(str[i]);
             int c=unlink(path);
             free(path);
 
@@ -351,6 +388,18 @@ void mkdir_m(char** str, int len)
 
             if(c==-1)
             printf("Error: %s\n",strerror(errno));
+
+        }else if(startsWith(str[i],"../"))
+        {
+            char* path=return_parent_path(str[i]);
+            printf("path is %s\n",path);
+
+            int c=mkdir(path,S_IRWXU | S_IRWXG | S_IRWXO);
+            free(path);
+
+            if(c==-1)
+            printf("Error: %s\n",strerror(errno));
+
 
         }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
         {
@@ -433,6 +482,10 @@ void wc(char** str, int len)
             path=home_path(str[i]);
             //printf("path is %s\n",path);
 
+        }else if(startsWith(str[i],"../"))
+        {
+            path=return_parent_path(str[i]);
+            
         }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
         {
             path=relative_path(str[i]);
@@ -510,4 +563,35 @@ char* return_name(char* str)
     }
 
     return temp;
+}
+
+bool startsWith(char* haystack, char* needle)
+{
+    for(int i=0;needle[i]!='\0';i++)
+    {
+        if(needle[i]!=haystack[i])
+        return false;
+    }
+
+    return true;
+}
+
+char* return_parent_path(char* str)
+{
+    int len=strlen(cd_ar);
+    char* path=(char*)malloc(sizeof(char)*strlen(cd_ar)+1);
+    strcpy(path,cd_ar);
+    for(int i=len-2;i>=0;i--)
+    {
+        if(path[i]=='/')
+        {
+            path[i+1]='\0';
+            break;
+        }
+    }
+
+    path=realloc(path,sizeof(char)*(strlen(path)+strlen(str+3)+1));
+    strcat(path,str+3);
+
+    return path;
 }

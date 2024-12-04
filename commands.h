@@ -33,5 +33,9 @@ void wc(char** str, int len);
 
 char* return_name(char* str);
 
+char* return_parent_path(char* str);
+
+bool startsWith(char* haystack, char* needle);
+
 
 #endif

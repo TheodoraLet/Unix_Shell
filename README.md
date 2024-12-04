@@ -21,6 +21,7 @@ cd command can take the following parameters
 * Goes to the parent directory : cd ..
 * Goes to what path is given : cd /home/user/folder/  OR cd ~/folder/  cd folder/  cd ../folder/ cd ./folder/
 * Goes to home directory : cd 
+
 The function does not support:
 * Error checking, it will not give error if give an invalid path 
 
@@ -37,7 +38,7 @@ echo commad prints anything typed after it, does not need " " marks
 whoami command does not take any arguments or options it just prints the home directory
 
 # touch
-touch command creates multiple files for any kind of path given. A valid example that creaets 5 files is the following:
+touch command creates multiple files for any kind of path given. A valid example that creates 5 files is the following:
 * touch ~/folder/file1.txt /home/user/file2.txt  ../folder/file3.txt ./folder/file4.txt folder/file5.txt  
 
 touch command gives an error if an invalid path is given
@@ -62,6 +63,7 @@ Valid examples of cp command are:
 * cp this_folder/file.pdf  ~/what/ever/path or this_folder/file.pdf  ~/what/ever/path/file_name.txt
 * cp file.txt ./folder/   and ./folder/new_name.txt
 * cp ../file.txt  ~/folder/whatever_name.txt 
+
 So it typically supports any type of path and any type of name (given or not) for the copied file.
 
 

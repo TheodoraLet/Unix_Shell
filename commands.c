@@ -42,7 +42,7 @@ void touch(char** str,int len)
             free(path);
             
             if(c)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else if(startsWith(str[i],"../"))
         {
@@ -53,7 +53,7 @@ void touch(char** str,int len)
             free(path);
             
             if(c)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
         {
@@ -65,7 +65,7 @@ void touch(char** str,int len)
             free(path);
             
             if(c)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else if(str[i][0]=='/'){
             printf("path is %s\n",str[i]);
@@ -73,7 +73,7 @@ void touch(char** str,int len)
             int c=fclose(file);
 
             if(c)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else{
             printf("did not find the file\n");
@@ -326,7 +326,6 @@ void return_suffix(char* path2,char* str)
 
 void rm(char** str,int len)
 {
-    printf("len is %d\n",len);
     for(int i=0;i<len;i++)
     {
         if(str[i][0]=='~')
@@ -336,7 +335,7 @@ void rm(char** str,int len)
             free(path);
 
             if(c!=0)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else if(startsWith(str[i],"../"))
         {
@@ -345,7 +344,7 @@ void rm(char** str,int len)
             free(path);
 
             if(c!=0)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else if(isalnum(str[i][0])==8 || str[i][0]=='.')
         {
@@ -354,7 +353,7 @@ void rm(char** str,int len)
             free(path);
 
             if(c!=0)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else if(str[i][0]=='/'){
             char temp[strlen(str[i])+1];
@@ -362,7 +361,7 @@ void rm(char** str,int len)
             int c=unlink(temp);
 
             if(c!=0)
-            printf("an error occured\n");
+            printf("Error: %s\n",strerror(errno));
 
         }else{
             printf("did not find the file\n");

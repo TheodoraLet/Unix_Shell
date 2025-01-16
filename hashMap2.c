@@ -28,7 +28,7 @@ void rehash(hashNode* ar,int* hashMapSize)
         int hashIndex=hash(ar->key,2*(*hashMapSize));
         while(new[hashIndex].key!=NULL && new[hashIndex].key!=ar[hashIndex].key)
         {
-            hashIndex=(hashIndex+1)%(*hashMapSize);
+            hashIndex=(hashIndex+1)%(2*(*hashMapSize));
         }
 
         new[hashIndex].key=(char*)malloc(sizeof(char)*(strlen(ar[hashIndex].key)+1));
